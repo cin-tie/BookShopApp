@@ -377,4 +377,4 @@ The database structure supports:
 - pickup point selection
 - persistent local storage using SQLite
 
-![Database Model](https://github.com/cin-tie/tpmp-lab4-uml/blob/main/img/lab9_database_model.drawio.svg)
+![Database Model](https://github.com/cin-tie/tpmp-lab4-uml/blob/main/blob/main/img/lab9_database_model.drawio.svg)
