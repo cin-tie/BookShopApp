@@ -341,23 +341,40 @@ Alternative flow:
 
 ## 4.5 Database Model
 
-The database model is based on SQLite storage.
+The database model is based on SQLite storage and describes the main entities,
+their attributes, and relationships used in the application.
 
 Main tables:
 - users
-- products
+- delivery_addresses
 - categories
+- products
+- carts
 - cart_items
 - orders
 - order_items
 - payments
-- delivery_addresses
 - pickup_points
 
 Relationships:
-- one user → many orders
-- one order → many order items
-- one product → many cart items
-- one category → many products
+- one user can have multiple delivery addresses
+- one user owns one shopping cart
+- one user can place multiple orders
+- one category contains multiple products
+- one cart contains multiple cart items
+- one order contains multiple order items
+- one product can appear in multiple cart items
+- one product can appear in multiple order items
+- one order has one payment
+- one pickup point can be associated with multiple orders
 
-![Database Model](https://github.com/cin-tie/tpmp-lab4-uml/blob/main/blob/main/img/lab9_database_model.drawio.svg)
+The database structure supports:
+- authentication and profile management
+- product catalog management
+- shopping cart functionality
+- order processing
+- payment management
+- pickup point selection
+- persistent local storage using SQLite
+
+![Database Model](https://github.com/cin-tie/tpmp-lab4-uml/blob/main/img/lab9_database_model.drawio.svg)
