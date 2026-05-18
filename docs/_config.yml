@@ -1,22 +1,19 @@
 title: BookShopApp
-description: iOS e-commerce application developed with SwiftUI
+description: iOS mobile e-commerce application for books and stationery products
 theme: minima
 
 markdown: kramdown
 
 plugins:
-  - jekyll-feed
+  - jekyll-seo-tag
 
 header_pages:
-  - requirements.md
-  - user-stories.md
-  - architecture.md
+  - index.md
+  - functional-requirements.md
+  - application-file-diagram.md
   - additional-specification.md
   - database-schema.md
   - presentation.md
 
 minima:
-  social_links:
-    github: cin-tie
-
-show_excerpts: false
+  skin: dark
