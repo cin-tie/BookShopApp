@@ -14,13 +14,8 @@ struct BookShopAppApp: App {
     var body: some Scene {
         WindowGroup {
             if session.currentUser != nil {
-                // Placeholder until MainTabView is implemented
-                Text("You're logged in as \(session.currentUser!.name)")
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Logout") { session.logout() }
-                        }
-                    }
+                MainTabView()
+                    .environmentObject(session)
             } else {
                 WelcomeView()
                     .environmentObject(session)
