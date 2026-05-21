@@ -16,7 +16,7 @@ struct MainTabView: View {
             CatalogView(cartViewModel: cartViewModel)
                 .tabItem { Label("Shop", systemImage: "books.vertical.fill") }
 
-            CartView(viewModel: cartViewModel)                          // ← передаём
+            CartView(viewModel: cartViewModel)
                 .tabItem { Label("Cart", systemImage: "cart.fill") }
                 .badge(cartViewModel.badgeCount > 0 ? cartViewModel.badgeCount : 0)
 

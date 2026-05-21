@@ -57,6 +57,12 @@ final class OrderRepository {
         return orders
     }
 
+    func confirmOrder(id: Int) {
+        sqlite3_exec(db.database,
+            "UPDATE orders SET status = 'confirmed' WHERE id = \(id);",
+            nil, nil, nil)
+    }
+    
     func cancelOrder(id: Int) {
         sqlite3_exec(db.database,
             "UPDATE orders SET status = 'cancelled' WHERE id = \(id) AND status = 'pending';",
