@@ -50,6 +50,57 @@ final class DatabaseService {
                 imageUrl TEXT,
                 FOREIGN KEY (categoryId) REFERENCES categories(id)
             );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS carts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                userId INTEGER NOT NULL UNIQUE,
+                totalPrice REAL NOT NULL DEFAULT 0,
+                FOREIGN KEY (userId) REFERENCES users(id)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS cart_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                cartId INTEGER NOT NULL,
+                productId INTEGER NOT NULL,
+                quantity INTEGER NOT NULL DEFAULT 1,
+                subtotal REAL NOT NULL DEFAULT 0,
+                FOREIGN KEY (cartId) REFERENCES carts(id),
+                FOREIGN KEY (productId) REFERENCES products(id)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                userId INTEGER NOT NULL,
+                pickupPointId INTEGER,
+                status TEXT NOT NULL DEFAULT 'pending',
+                totalPrice REAL NOT NULL DEFAULT 0,
+                createdAt TEXT NOT NULL,
+                FOREIGN KEY (userId) REFERENCES users(id)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS order_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                orderId INTEGER NOT NULL,
+                productId INTEGER NOT NULL,
+                quantity INTEGER NOT NULL,
+                subtotal REAL NOT NULL,
+                FOREIGN KEY (orderId) REFERENCES orders(id),
+                FOREIGN KEY (productId) REFERENCES products(id)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS payments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                orderId INTEGER NOT NULL UNIQUE,
+                paymentMethod TEXT NOT NULL,
+                amount REAL NOT NULL,
+                paymentStatus TEXT NOT NULL DEFAULT 'pending',
+                FOREIGN KEY (orderId) REFERENCES orders(id)
+            );
             """
         ]
         statements.forEach { exec($0) }
@@ -169,4 +220,6 @@ final class DatabaseService {
         sqlite3_finalize(stmt)
         return count
     }
+
+    var database: OpaquePointer? { db }
 }

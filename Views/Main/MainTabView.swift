@@ -9,49 +9,47 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject private var session: SessionService
+    @StateObject private var cartViewModel = CartViewModel()
 
     var body: some View {
         TabView {
-            CatalogView()
-                .tabItem {
-                    Label("Shop", systemImage: "books.vertical.fill")
-                }
+            CatalogView(cartViewModel: cartViewModel)
+                .tabItem { Label("Shop", systemImage: "books.vertical.fill") }
 
-            // Placeholder — реализуется в feature/cart-module
-            NavigationStack {
-                VStack(spacing: 16) {
-                    Image(systemName: "cart")
-                        .font(.system(size: 48))
-                        .foregroundStyle(Color.accent.opacity(0.4))
-                    Text("Cart")
-                        .font(.system(size: 20, weight: .semibold))
-                    Text("Coming in next module")
-                        .foregroundStyle(.secondary)
-                }
-                .navigationTitle("Cart")
-            }
-            .tabItem {
-                Label("Cart", systemImage: "cart.fill")
-            }
+            CartView(viewModel: cartViewModel)                          // ← передаём
+                .tabItem { Label("Cart", systemImage: "cart.fill") }
+                .badge(cartViewModel.badgeCount > 0 ? cartViewModel.badgeCount : 0)
 
-            // Placeholder — реализуется в feature/profile-module
-            NavigationStack {
-                VStack(spacing: 16) {
-                    Image(systemName: "person.circle")
-                        .font(.system(size: 48))
-                        .foregroundStyle(Color.accent.opacity(0.4))
-                    Text(session.currentUser?.name ?? "")
-                        .font(.system(size: 20, weight: .semibold))
-                    Button("Logout") { session.logout() }
-                        .foregroundStyle(.red)
-                }
-                .navigationTitle("Profile")
-            }
-            .tabItem {
-                Label("Profile", systemImage: "person.fill")
-            }
+            profileTab
+                .tabItem { Label("Profile", systemImage: "person.fill") }
         }
         .tint(Color.accent)
+        .onAppear { cartViewModel.loadCart() }
+    }
+
+    private var profileTab: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Spacer()
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 72))
+                    .foregroundStyle(Color.accent.opacity(0.35))
+                VStack(spacing: 4) {
+                    Text(session.currentUser?.name ?? "")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                    Text(session.currentUser?.email ?? "")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                PrimaryButton(title: "Logout", style: .outlined) {
+                    session.logout()
+                }
+                .padding(.horizontal, 32)
+                .padding(.bottom, 40)
+            }
+            .navigationTitle("Profile")
+        }
     }
 }
 

@@ -11,6 +11,7 @@ struct CatalogView: View {
     @StateObject private var viewModel = CatalogViewModel()
     @EnvironmentObject private var session: SessionService
     @State private var selectedProduct: Product?
+    var cartViewModel: CartViewModel
 
     private let columns = [
         GridItem(.flexible(), spacing: 14),
@@ -90,12 +91,11 @@ struct CatalogView: View {
                     } else {
                         LazyVGrid(columns: columns, spacing: 14) {
                             ForEach(viewModel.products) { product in
-                                ProductCard(product: product) {
-                                    // Cart action — implemented in cart module
-                                }
-                                .onTapGesture {
-                                    selectedProduct = product
-                                }
+                                ProductCard(
+                                    product: product,
+                                    onAddToCart: { cartViewModel.addProduct(product) },
+                                    onTap: { selectedProduct = product }
+                                )
                             }
                         }
                         .padding(.horizontal, 20)
@@ -107,7 +107,7 @@ struct CatalogView: View {
             .scrollIndicators(.hidden)
             .navigationBarHidden(true)
             .sheet(item: $selectedProduct) { product in
-                ProductDetailView(product: product)
+                ProductDetailView(product: product, cartViewModel: cartViewModel)
             }
         }
     }
@@ -131,12 +131,12 @@ struct CatalogView: View {
 }
 
 #Preview("Catalog Light") {
-    CatalogView()
+    CatalogView(cartViewModel: CartViewModel())
         .environmentObject(SessionService.shared)
 }
 
 #Preview("Catalog Dark") {
-    CatalogView()
+    CatalogView(cartViewModel: CartViewModel())
         .environmentObject(SessionService.shared)
         .preferredColorScheme(.dark)
 }

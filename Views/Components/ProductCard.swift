@@ -10,10 +10,10 @@ import SwiftUI
 struct ProductCard: View {
     let product: Product
     var onAddToCart: () -> Void = {}
-
+    var onTap: () -> Void = {}
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Image
             ZStack(alignment: .topTrailing) {
                 AsyncImage(url: URL(string: product.imageUrl ?? "")) { phase in
                     switch phase {
@@ -44,9 +44,8 @@ struct ProductCard: View {
                         .padding(8)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 0))
 
-            // Info
+            // Info area
             VStack(alignment: .leading, spacing: 6) {
                 Text(product.title)
                     .font(.system(size: 13, weight: .medium))
@@ -68,7 +67,7 @@ struct ProductCard: View {
                             .background(product.isAvailable ? Color.accent : Color(.systemGray4))
                             .clipShape(Circle())
                     }
-                    .disabled(!product.isAvailable)
+                    .buttonStyle(.plain)                    .disabled(!product.isAvailable)
                 }
             }
             .padding(12)
@@ -76,17 +75,23 @@ struct ProductCard: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
+        .contentShape(Rectangle())
+        .onTapGesture { onTap() }
     }
 }
 
 #Preview("Product Card") {
-    ProductCard(product: Product(
-        id: 1, categoryId: 1,
-        title: "The Midnight Library",
-        description: "A novel about all the lives you could have lived.",
-        price: 14.99, stock: 5,
-        imageUrl: "https://covers.openlibrary.org/b/id/10909258-L.jpg"
-    ))
+    ProductCard(
+        product: Product(
+            id: 1, categoryId: 1,
+            title: "The Midnight Library",
+            description: "A novel about all the lives you could have lived.",
+            price: 14.99, stock: 5,
+            imageUrl: "https://covers.openlibrary.org/b/id/10909258-L.jpg"
+        ),
+        onAddToCart: { print("Added to cart") },
+        onTap: { print("Open details") }
+    )
     .frame(width: 180)
     .padding()
 }

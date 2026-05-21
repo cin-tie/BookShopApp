@@ -11,6 +11,7 @@ struct ProductDetailView: View {
     let product: Product
     @Environment(\.dismiss) private var dismiss
     @State private var appear = false
+    var cartViewModel: CartViewModel
 
     var body: some View {
         NavigationStack {
@@ -74,7 +75,10 @@ struct ProductDetailView: View {
                         PrimaryButton(
                             title: product.isAvailable ? "Add to Cart" : "Out of Stock"
                         ) {
-                            // Cart integration in cart module
+                            cartViewModel.addProduct(product)
+                            withAnimation {
+                                    dismiss()
+                                }
                         }
                         .disabled(!product.isAvailable)
                         .opacity(product.isAvailable ? 1 : 0.5)
@@ -105,5 +109,5 @@ struct ProductDetailView: View {
         description: "A novel about all the lives you could have lived. Between life and death there is a library.",
         price: 14.99, stock: 5,
         imageUrl: "https://covers.openlibrary.org/b/id/10909258-L.jpg"
-    ))
+    ), cartViewModel: CartViewModel())
 }
