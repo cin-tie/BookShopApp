@@ -101,6 +101,17 @@ final class DatabaseService {
                 paymentStatus TEXT NOT NULL DEFAULT 'pending',
                 FOREIGN KEY (orderId) REFERENCES orders(id)
             );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS delivery_addresses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                userId INTEGER NOT NULL,
+                city TEXT NOT NULL DEFAULT '',
+                street TEXT NOT NULL DEFAULT '',
+                house TEXT NOT NULL DEFAULT '',
+                postalCode TEXT NOT NULL DEFAULT '',
+                FOREIGN KEY (userId) REFERENCES users(id)
+            );
             """
         ]
         statements.forEach { exec($0) }

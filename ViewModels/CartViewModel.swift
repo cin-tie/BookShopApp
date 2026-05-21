@@ -20,18 +20,16 @@ final class CartViewModel: ObservableObject {
     private let orderRepo = OrderRepository.shared
     private let session   = SessionService.shared
 
-    private var userId: Int { session.numericUserId() }
-
+    private var userId: Int { session.stableUserId() }
+    
     // MARK: - Cart
 
     func loadCart() {
-        guard userId != 0 else { return }
         items = cartRepo.fetchCartItems(userId: userId)
         badgeCount = items.reduce(0) { $0 + $1.quantity }
     }
 
     func addProduct(_ product: Product) {
-        guard userId != 0 else { return }
         cartRepo.addProduct(product.id, userId: userId)
         loadCart()
     }
@@ -47,7 +45,6 @@ final class CartViewModel: ObservableObject {
     }
 
     func decrement(item: CartItem) {
-        // Минимум 1 — убираем кнопкой trash, не декрементом
         guard item.quantity > 1 else { return }
         cartRepo.updateQuantity(itemId: item.id, quantity: item.quantity - 1, userId: userId)
         loadCart()
@@ -67,7 +64,7 @@ final class CartViewModel: ObservableObject {
     // MARK: - Checkout
 
     func placeOrder() {
-        guard !items.isEmpty, userId != 0 else { return }
+        guard !items.isEmpty else { return }
         let order = orderRepo.createOrder(userId: userId, items: items, total: total)
         cartRepo.clearCart(userId: userId)
         loadCart()
@@ -78,7 +75,6 @@ final class CartViewModel: ObservableObject {
     // MARK: - Orders
 
     func loadOrders() {
-        guard userId != 0 else { return }
         orders = orderRepo.fetchOrders(userId: userId)
     }
 

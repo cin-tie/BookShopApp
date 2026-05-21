@@ -11,6 +11,7 @@ struct CartView: View {
     @ObservedObject var viewModel: CartViewModel
     @State private var showConfirmation = false
     @State private var showOrders = false
+    @State private var showCheckout = false
 
     var body: some View {
         NavigationStack {
@@ -48,6 +49,11 @@ struct CartView: View {
             }
             .onChange(of: viewModel.placedOrder) { _, new in
                 if new != nil { showConfirmation = true }
+            }
+            .sheet(isPresented: $showCheckout, onDismiss: {   // ← вот он
+                viewModel.loadCart()
+            }) {
+                CheckoutView(items: viewModel.items)
             }
         }
     }
@@ -104,8 +110,8 @@ struct CartView: View {
 
             VStack(spacing: 0) {
                 Divider()
-                PrimaryButton(title: "Place Order — \(viewModel.formattedTotal)") {
-                    viewModel.placeOrder()
+                PrimaryButton(title: "Checkout — \(viewModel.formattedTotal)") {
+                    showCheckout = true
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
