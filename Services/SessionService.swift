@@ -83,8 +83,18 @@ final class SessionService: ObservableObject {
         if let data = try? JSONEncoder().encode(user) {
             UserDefaults.standard.set(data, forKey: userKey)
         }
+        let numericKey = "user_numeric_id_\(user.email)"
+        if UserDefaults.standard.integer(forKey: numericKey) == 0 {
+            let stableId = abs(user.email.hashValue) % 1_000_000 + 1
+            UserDefaults.standard.set(stableId, forKey: numericKey)
+        }
     }
 
+    func numericUserId() -> Int {
+        guard let user = currentUser else { return 0 }
+        let key = "user_numeric_id_\(user.email)"
+        return UserDefaults.standard.integer(forKey: key)
+    }
     private func loadAllUsers() -> [User] {
         guard let data = UserDefaults.standard.data(forKey: allUsersKey),
               let users = try? JSONDecoder().decode([User].self, from: data)
