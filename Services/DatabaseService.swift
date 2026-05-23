@@ -15,6 +15,7 @@ final class DatabaseService {
     private init() {
         openDatabase()
         createTables()
+        migrateIfNeeded()
         seedIfNeeded()
     }
 
@@ -112,6 +113,15 @@ final class DatabaseService {
                 postalCode TEXT NOT NULL DEFAULT '',
                 FOREIGN KEY (userId) REFERENCES users(id)
             );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS pickup_points (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                address TEXT NOT NULL,
+                latitude REAL NOT NULL,
+                longitude REAL NOT NULL
+            );
             """
         ]
         statements.forEach { exec($0) }
@@ -120,43 +130,59 @@ final class DatabaseService {
     // MARK: - Seed Data
 
     private func seedIfNeeded() {
-        guard countRows(in: "categories") == 0 else { return }
+        // MARK: Categories + Products
+        if countRows(in: "categories") == 0 {
+            let categories: [(String, String)] = [
+                ("Fiction", "book.fill"),
+                ("Non-Fiction", "brain.head.profile"),
+                ("Science", "atom"),
+                ("Art & Design", "paintpalette.fill"),
+                ("Stationery", "pencil.and.ruler.fill")
+            ]
+            for (title, icon) in categories {
+                exec("INSERT INTO categories (title, icon) VALUES ('\(title)', '\(icon)');")
+            }
 
-        let categories: [(String, String)] = [
-            ("Fiction", "book.fill"),
-            ("Non-Fiction", "brain.head.profile"),
-            ("Science", "atom"),
-            ("Art & Design", "paintpalette.fill"),
-            ("Stationery", "pencil.and.ruler.fill")
-        ]
-
-        for (title, icon) in categories {
-            exec("INSERT INTO categories (title, icon) VALUES ('\(title)', '\(icon)');")
+            let products: [(Int, String, String, Double, Int, String)] = [
+                (1, "The Midnight Library", "A novel about all the lives you could have lived.", 14.99, 23, "https://covers.openlibrary.org/b/id/10909258-L.jpg"),
+                (1, "Project Hail Mary", "An astronaut wakes up alone in space.", 16.99, 15, "https://covers.openlibrary.org/b/id/10527843-L.jpg"),
+                (1, "Circe", "The story of the witch of Greek myth.", 13.99, 30, "https://covers.openlibrary.org/b/id/8739161-L.jpg"),
+                (1, "The Name of the Wind", "The tale of a legendary wizard.", 15.99, 12, "https://covers.openlibrary.org/b/id/8388636-L.jpg"),
+                (2, "Atomic Habits", "Tiny changes, remarkable results.", 17.99, 40, "https://covers.openlibrary.org/b/id/10130533-L.jpg"),
+                (2, "Sapiens", "A brief history of humankind.", 18.99, 25, "https://covers.openlibrary.org/b/id/8758981-L.jpg"),
+                (2, "Deep Work", "Rules for focused success.", 15.99, 18, "https://covers.openlibrary.org/b/id/9252896-L.jpg"),
+                (3, "A Brief History of Time", "From the big bang to black holes.", 12.99, 20, "https://covers.openlibrary.org/b/id/8372504-L.jpg"),
+                (3, "The Elegant Universe", "Superstrings and the theory of everything.", 14.99, 10, "https://covers.openlibrary.org/b/id/240726-L.jpg"),
+                (4, "The Elements of Style", "The classic guide to writing.", 11.99, 35, "https://covers.openlibrary.org/b/id/7898591-L.jpg"),
+                (4, "Steal Like an Artist", "10 things nobody told you about creativity.", 13.99, 22, "https://covers.openlibrary.org/b/id/8157356-L.jpg"),
+                (5, "Leuchtturm1917 Notebook", "Hardcover dotted journal, A5.", 24.99, 50, "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400"),
+                (5, "Staedtler Pencil Set", "12-piece premium graphite set.", 9.99, 60, "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=400")
+            ]
+            for (catId, title, desc, price, stock, url) in products {
+                let safe = title.replacingOccurrences(of: "'", with: "''")
+                let safeDesc = desc.replacingOccurrences(of: "'", with: "''")
+                exec("""
+                    INSERT INTO products (categoryId, title, description, price, stock, imageUrl)
+                    VALUES (\(catId), '\(safe)', '\(safeDesc)', \(price), \(stock), '\(url)');
+                """)
+            }
         }
 
-        let products: [(Int, String, String, Double, Int, String)] = [
-            (1, "The Midnight Library", "A novel about all the lives you could have lived.", 14.99, 23, "https://covers.openlibrary.org/b/id/10909258-L.jpg"),
-            (1, "Project Hail Mary", "An astronaut wakes up alone in space.", 16.99, 15, "https://covers.openlibrary.org/b/id/10527843-L.jpg"),
-            (1, "Circe", "The story of the witch of Greek myth.", 13.99, 30, "https://covers.openlibrary.org/b/id/8739161-L.jpg"),
-            (1, "The Name of the Wind", "The tale of a legendary wizard.", 15.99, 12, "https://covers.openlibrary.org/b/id/8388636-L.jpg"),
-            (2, "Atomic Habits", "Tiny changes, remarkable results.", 17.99, 40, "https://covers.openlibrary.org/b/id/10130533-L.jpg"),
-            (2, "Sapiens", "A brief history of humankind.", 18.99, 25, "https://covers.openlibrary.org/b/id/8758981-L.jpg"),
-            (2, "Deep Work", "Rules for focused success.", 15.99, 18, "https://covers.openlibrary.org/b/id/9252896-L.jpg"),
-            (3, "A Brief History of Time", "From the big bang to black holes.", 12.99, 20, "https://covers.openlibrary.org/b/id/8372504-L.jpg"),
-            (3, "The Elegant Universe", "Superstrings and the theory of everything.", 14.99, 10, "https://covers.openlibrary.org/b/id/240726-L.jpg"),
-            (4, "The Elements of Style", "The classic guide to writing.", 11.99, 35, "https://covers.openlibrary.org/b/id/7898591-L.jpg"),
-            (4, "Steal Like an Artist", "10 things nobody told you about creativity.", 13.99, 22, "https://covers.openlibrary.org/b/id/8157356-L.jpg"),
-            (5, "Leuchtturm1917 Notebook", "Hardcover dotted journal, A5.", 24.99, 50, "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400"),
-            (5, "Staedtler Pencil Set", "12-piece premium graphite set.", 9.99, 60, "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=400")
-        ]
-
-        for (catId, title, desc, price, stock, url) in products {
-            let safe = title.replacingOccurrences(of: "'", with: "''")
-            let safeDesc = desc.replacingOccurrences(of: "'", with: "''")
-            exec("""
-                INSERT INTO products (categoryId, title, description, price, stock, imageUrl)
-                VALUES (\(catId), '\(safe)', '\(safeDesc)', \(price), \(stock), '\(url)');
-            """)
+        // MARK: Pickup Points — отдельный независимый блок
+        if countRows(in: "pickup_points") == 0 {
+            let pickupPoints: [(String, String, Double, Double)] = [
+                ("BookShop Central",    "123 5th Avenue, New York, NY 10001",      40.7549, -73.9840),
+                ("BookShop Midtown",    "456 Madison Avenue, New York, NY 10022",  40.7580, -73.9855),
+                ("BookShop Downtown",   "789 Broadway, New York, NY 10003",        40.7282, -73.9942),
+                ("BookShop Upper East", "321 Lexington Ave, New York, NY 10016",   40.7488, -73.9780),
+                ("BookShop Brooklyn",   "555 Atlantic Ave, Brooklyn, NY 11217",    40.6841, -73.9774),
+                ("BookShop Soho",       "88 Spring Street, New York, NY 10012",    40.7248, -73.9977),
+            ]
+            for (title, address, lat, lng) in pickupPoints {
+                let safeTitle   = title.replacingOccurrences(of: "'", with: "''")
+                let safeAddress = address.replacingOccurrences(of: "'", with: "''")
+                exec("INSERT INTO pickup_points (title, address, latitude, longitude) VALUES ('\(safeTitle)', '\(safeAddress)', \(lat), \(lng));")
+            }
         }
     }
 
@@ -233,4 +259,40 @@ final class DatabaseService {
     }
 
     var database: OpaquePointer? { db }
+    
+    private func migrateIfNeeded() {
+        var version: Int32 = 0
+        var stmt: OpaquePointer?
+        if sqlite3_prepare_v2(db, "PRAGMA user_version;", -1, &stmt, nil) == SQLITE_OK,
+           sqlite3_step(stmt) == SQLITE_ROW {
+            version = sqlite3_column_int(stmt, 0)
+        }
+        sqlite3_finalize(stmt)
+
+        if version < 1 {
+            exec("""
+                CREATE TABLE IF NOT EXISTS delivery_addresses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    userId INTEGER NOT NULL,
+                    city TEXT NOT NULL DEFAULT '',
+                    street TEXT NOT NULL DEFAULT '',
+                    house TEXT NOT NULL DEFAULT '',
+                    postalCode TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY (userId) REFERENCES users(id)
+                );
+            """)
+            exec("""
+                CREATE TABLE IF NOT EXISTS pickup_points (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    address TEXT NOT NULL,
+                    latitude REAL NOT NULL,
+                    longitude REAL NOT NULL
+                );
+            """)
+            exec("PRAGMA user_version = 1;")
+            print("DB migrated to version 1")
+        }
+    }
 }
+

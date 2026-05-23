@@ -7,13 +7,12 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct CheckoutView: View {
     @StateObject private var viewModel: CheckoutViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showPaymentSheet  = false
     @State private var showAddressSheet  = false
+    @State private var showPickupMap = false
 
     init(items: [CartItem]) {
         _viewModel = StateObject(wrappedValue: CheckoutViewModel(items: items))
@@ -46,6 +45,11 @@ struct CheckoutView: View {
         }
         .sheet(isPresented: $showAddressSheet) {
             DeliveryAddressSheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showPickupMap) {
+            PickupMapView { point in
+                viewModel.selectedPickupPoint = point
+            }
         }
     }
 
@@ -85,36 +89,90 @@ struct CheckoutView: View {
                     .buttonStyle(.plain)
                 }
 
-                // Delivery address
-                sectionCard(title: "Delivery Address") {
-                    Button { showAddressSheet = true } label: {
-                        HStack(spacing: 14) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(hex: "22C55E").opacity(0.12))
-                                    .frame(width: 40, height: 40)
-                                Image(systemName: "mappin.circle.fill")
-                                    .foregroundStyle(Color(hex: "22C55E"))
-                            }
-                            VStack(alignment: .leading, spacing: 2) {
-                                if let address = viewModel.selectedAddress {
-                                    Text(address.fullAddress)
-                                        .font(.system(size: 15, weight: .medium))
-                                        .foregroundStyle(Color(.label))
-                                        .lineLimit(2)
-                                } else {
-                                    Text("Add delivery address")
-                                        .font(.system(size: 15, weight: .medium))
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 13))
-                                .foregroundStyle(.secondary)
-                        }
+                // Delivery mode picker
+                sectionCard(title: "Delivery Method") {
+                    HStack(spacing: 0) {
+                        deliveryModeButton(
+                            title: "Pickup",
+                            icon: "storefront.fill",
+                            mode: .pickup
+                        )
+                        deliveryModeButton(
+                            title: "Delivery",
+                            icon: "box.truck.fill",
+                            mode: .delivery
+                        )
                     }
-                    .buttonStyle(.plain)
+                    .background(Color(.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
+                // Conditional section
+                if viewModel.deliveryMode == .pickup {
+                    sectionCard(title: "Pickup Point") {
+                        Button { showPickupMap = true } label: {
+                            HStack(spacing: 14) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(hex: "F59E0B").opacity(0.12))
+                                        .frame(width: 40, height: 40)
+                                    Image(systemName: "storefront.fill")
+                                        .foregroundStyle(Color(hex: "F59E0B"))
+                                }
+                                VStack(alignment: .leading, spacing: 2) {
+                                    if let point = viewModel.selectedPickupPoint {
+                                        Text(point.title)
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(Color(.label))
+                                        Text(point.address)
+                                            .font(.system(size: 12))
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    } else {
+                                        Text("Select pickup point")
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                } else {
+                    sectionCard(title: "Delivery Address") {
+                        Button { showAddressSheet = true } label: {
+                            HStack(spacing: 14) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(hex: "22C55E").opacity(0.12))
+                                        .frame(width: 40, height: 40)
+                                    Image(systemName: "mappin.circle.fill")
+                                        .foregroundStyle(Color(hex: "22C55E"))
+                                }
+                                VStack(alignment: .leading, spacing: 2) {
+                                    if let address = viewModel.selectedAddress {
+                                        Text(address.fullAddress)
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(Color(.label))
+                                            .lineLimit(2)
+                                    } else {
+                                        Text("Add delivery address")
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
 
                 // Total
@@ -129,6 +187,19 @@ struct CheckoutView: View {
                     }
                 }
 
+                if let error = viewModel.errorMessage {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.circle.fill")
+                        Text(error)
+                            .font(.system(size: 14))
+                    }
+                    .foregroundStyle(.red)
+                    .padding(12)
+                    .background(Color.red.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .transition(.scale(scale: 0.95).combined(with: .opacity))
+                }
+                
                 // Actions
                 VStack(spacing: 12) {
                     PrimaryButton(title: "Pay \(viewModel.formattedTotal)") {
@@ -144,6 +215,8 @@ struct CheckoutView: View {
             .padding(.top, 16)
         }
         .scrollIndicators(.hidden)
+        .background(Color(.systemGroupedBackground))
+        .animation(.easeInOut(duration: 0.2), value: viewModel.deliveryMode)
     }
 
     // MARK: - Processing
@@ -163,6 +236,8 @@ struct CheckoutView: View {
             }
             Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground))
     }
 
     // MARK: - Success
@@ -202,6 +277,8 @@ struct CheckoutView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground))
     }
 
     // MARK: - Helpers
@@ -260,32 +337,41 @@ struct CheckoutView: View {
         .padding(16)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .shadow(color: .black.opacity(0.02), radius: 6, x: 0, y: 2)
     }
-}
+    
+    private func deliveryModeButton(title: String, icon: String, mode: DeliveryMode) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                viewModel.deliveryMode = mode
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                Text(title)
+                    .font(.system(size: 14, weight: .medium))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(
+                viewModel.deliveryMode == mode
+                    ? Color(.systemBackground)
+                    : Color.clear
+            )
+            .foregroundStyle(
+                viewModel.deliveryMode == mode
+                    ? Color.accent
+                    : Color(.secondaryLabel)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .padding(3)
+            .shadow(
+                color: viewModel.deliveryMode == mode ? .black.opacity(0.06) : .clear,
+                radius: 4, y: 1
+            )
+        }
+        .buttonStyle(.plain)
+    }
 
-#Preview("Checkout Light") {
-    CheckoutView(items: [
-        CartItem(id: 1, cartId: 1,
-                 product: Product(id: 1, categoryId: 1, title: "The Midnight Library",
-                                  description: "A novel.", price: 14.99, stock: 5,
-                                  imageUrl: nil),
-                 quantity: 2),
-        CartItem(id: 2, cartId: 1,
-                 product: Product(id: 2, categoryId: 2, title: "Atomic Habits",
-                                  description: "Tiny changes.", price: 17.99, stock: 10,
-                                  imageUrl: nil),
-                 quantity: 1)
-    ])
-}
-
-#Preview("Checkout Dark") {
-    CheckoutView(items: [
-        CartItem(id: 1, cartId: 1,
-                 product: Product(id: 1, categoryId: 1, title: "The Midnight Library",
-                                  description: "A novel.", price: 14.99, stock: 5,
-                                  imageUrl: nil),
-                 quantity: 1)
-    ])
-    .preferredColorScheme(.dark)
 }
