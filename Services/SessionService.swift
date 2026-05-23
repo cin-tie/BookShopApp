@@ -111,4 +111,10 @@ final class SessionService: ObservableObject {
             UserDefaults.standard.set(data, forKey: allUsersKey)
         }
     }
+    
+    func updateName(_ name: String) {
+        guard var user = currentUser else { return }
+        user = User(id: user.id, name: name, email: user.email, phone: user.phone)
+        saveSession(user)
+    }
 }
