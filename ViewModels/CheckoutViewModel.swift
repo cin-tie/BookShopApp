@@ -11,6 +11,11 @@ enum CheckoutStep {
     case summary, processing, success, failed
 }
 
+enum DeliveryMode {
+    case pickup
+    case delivery
+}
+
 @MainActor
 final class CheckoutViewModel: ObservableObject {
     // MARK: - State
@@ -21,6 +26,8 @@ final class CheckoutViewModel: ObservableObject {
     @Published var placedOrder: Order?
     @Published var payment: Payment?
     @Published var errorMessage: String?
+    @Published var selectedPickupPoint: PickupPoint?
+    @Published var deliveryMode: DeliveryMode = .pickup
 
     // MARK: - New address form
     @Published var newCity     = ""
@@ -90,10 +97,20 @@ final class CheckoutViewModel: ObservableObject {
 
     func placeOrder() {
         errorMessage = nil
-        guard !items.isEmpty else {
-            errorMessage = "Cart is empty"
-            return
-        }
+            guard !items.isEmpty else {
+                errorMessage = "Cart is empty"
+                return
+            }
+
+            if deliveryMode == .pickup && selectedPickupPoint == nil {
+                errorMessage = "Please select a pickup point"
+                return
+            }
+            if deliveryMode == .delivery && selectedAddress == nil {
+                errorMessage = "Please add a delivery address"
+                return
+            }
+
 
         step = .processing
 
