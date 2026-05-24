@@ -1,5 +1,7 @@
 # BookShopApp
 
+![iOS CI](https://github.com/cin-tie/BookShopApp/actions/workflows/ios-ci.yml/badge.svg)
+
 ## Project Name
 
 BookShopApp — mobile iOS application for purchasing books, electronic books, stationery products, and related goods.
