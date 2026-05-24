@@ -15,13 +15,16 @@ struct MainTabView: View {
         TabView {
             CatalogView(cartViewModel: cartViewModel)
                 .tabItem { Label("Shop", systemImage: "books.vertical.fill") }
+                .accessibilityIdentifier("shopTab")
 
             CartView(viewModel: cartViewModel)
                 .tabItem { Label("Cart", systemImage: "cart.fill") }
                 .badge(cartViewModel.badgeCount > 0 ? cartViewModel.badgeCount : 0)
-
+                .accessibilityIdentifier("cartTab")
+            
             ProfileView()
                 .tabItem { Label("Profile", systemImage: "person.fill") }
+                .accessibilityIdentifier("profile")
         }
         .tint(Color.accent)
         .onAppear { cartViewModel.loadCart() }

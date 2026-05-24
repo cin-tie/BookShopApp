@@ -93,6 +93,7 @@ struct ProfileView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Profile")
+            .accessibilityIdentifier("profileNavBar")
             .navigationBarTitleDisplayMode(.large)
             .navigationDestination(isPresented: $showOrders) {
                 OrdersFromProfileView()

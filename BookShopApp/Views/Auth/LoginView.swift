@@ -36,6 +36,7 @@ struct LoginView: View {
                         keyboardType: .emailAddress,
                         textContentType: .emailAddress
                     )
+                    .accessibilityIdentifier("emailTextField")
 
                     InputField(
                         title: "Password",
@@ -44,6 +45,7 @@ struct LoginView: View {
                         isSecure: true,
                         textContentType: .password
                     )
+                    .accessibilityIdentifier("passwordTextField")
                 }
 
                 // Error
@@ -53,6 +55,7 @@ struct LoginView: View {
                         Text(error)
                             .font(.system(size: 14))
                     }
+                    .accessibilityIdentifier("errorLabel")
                     .foregroundStyle(.red)
                     .padding(12)
                     .background(Color.red.opacity(0.08))
@@ -66,6 +69,7 @@ struct LoginView: View {
                     isLoading: viewModel.isLoading,
                     action: viewModel.login
                 )
+                .accessibilityIdentifier("loginButton")
 
                 // Divider
                 HStack {
@@ -86,6 +90,7 @@ struct LoginView: View {
                     .font(.system(size: 15))
                     .frame(maxWidth: .infinity)
                 }
+                .accessibilityIdentifier("registerButton")
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 40)

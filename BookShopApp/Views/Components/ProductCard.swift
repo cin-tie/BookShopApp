@@ -32,7 +32,7 @@ struct ProductCard: View {
                 }
                 .frame(height: 160)
                 .clipped()
-
+                
                 if !product.isAvailable {
                     Text("Out of stock")
                         .font(.system(size: 10, weight: .semibold))
@@ -44,21 +44,21 @@ struct ProductCard: View {
                         .padding(8)
                 }
             }
-
+            
             // Info area
             VStack(alignment: .leading, spacing: 6) {
                 Text(product.title)
                     .font(.system(size: 13, weight: .medium))
                     .lineLimit(2)
                     .foregroundStyle(Color(.label))
-
+                
                 HStack {
                     Text(product.formattedPrice)
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(Color.accent)
-
+                    
                     Spacer()
-
+                    
                     Button(action: onAddToCart) {
                         Image(systemName: "plus")
                             .font(.system(size: 13, weight: .bold))
@@ -67,7 +67,9 @@ struct ProductCard: View {
                             .background(product.isAvailable ? Color.accent : Color(.systemGray4))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(.plain)                    .disabled(!product.isAvailable)
+                    .buttonStyle(.plain)     
+                    .accessibilityIdentifier("addToCartButton\(product.id)")
+                    .disabled(!product.isAvailable)
                 }
             }
             .padding(12)
@@ -77,6 +79,7 @@ struct ProductCard: View {
         .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 2)
         .contentShape(Rectangle())
         .onTapGesture { onTap() }
+        .accessibilityIdentifier("productCard_\(product.id)")
     }
 }
 
