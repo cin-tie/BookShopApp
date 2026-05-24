@@ -23,6 +23,7 @@ struct CartView: View {
                 }
             }
             .navigationTitle("Cart")
+            .accessibilityIdentifier("cartNavBar")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -70,6 +71,7 @@ struct CartView: View {
                 Text("Your cart is empty")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(Color(hex: "1E1B4B"))
+                    .accessibilityIdentifier("emptyCartLabel")
                 Text("Add books and stationery\nfrom the catalog")
                     .font(.system(size: 15))
                     .foregroundStyle(.secondary)
@@ -98,6 +100,7 @@ struct CartView: View {
                     HStack {
                         Text("Total")
                             .font(.system(size: 16, weight: .medium))
+                            .accessibilityIdentifier("totalPriceLabel")
                         Spacer()
                         Text(viewModel.formattedTotal)
                             .font(.system(size: 20, weight: .bold))
@@ -113,6 +116,7 @@ struct CartView: View {
                 PrimaryButton(title: "Checkout — \(viewModel.formattedTotal)") {
                     showCheckout = true
                 }
+                .accessibilityIdentifier("checkoutButton")
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .background(Color(.systemBackground))

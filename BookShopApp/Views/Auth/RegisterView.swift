@@ -35,6 +35,7 @@ struct RegisterView: View {
                         text: $viewModel.registerName,
                         textContentType: .name
                     )
+                    .accessibilityIdentifier("nameTextField")
 
                     InputField(
                         title: "Email",
@@ -43,6 +44,7 @@ struct RegisterView: View {
                         keyboardType: .emailAddress,
                         textContentType: .emailAddress
                     )
+                    .accessibilityIdentifier("registerEmailTextField")
 
                     InputField(
                         title: "Password",
@@ -51,6 +53,7 @@ struct RegisterView: View {
                         isSecure: true,
                         textContentType: .newPassword
                     )
+                    .accessibilityIdentifier("registerPasswordTextField")
 
                     InputField(
                         title: "Confirm Password",
@@ -59,6 +62,7 @@ struct RegisterView: View {
                         isSecure: true,
                         textContentType: .newPassword
                     )
+                    .accessibilityIdentifier("confirmPasswordTextField")
                 }
 
                 // Password strength indicator
@@ -87,6 +91,7 @@ struct RegisterView: View {
                     isLoading: viewModel.isLoading,
                     action: viewModel.register
                 )
+                .accessibilityIdentifier("createAccountButton")
 
                 // Login link
                 NavigationLink(destination: LoginView()) {

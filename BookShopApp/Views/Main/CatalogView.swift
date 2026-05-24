@@ -104,6 +104,7 @@ struct CatalogView: View {
                     Spacer().frame(height: 30)
                 }
             }
+            .accessibilityIdentifier("catalogScreen")
             .scrollIndicators(.hidden)
             .navigationBarHidden(true)
             .sheet(item: $selectedProduct) { product in
@@ -120,6 +121,7 @@ struct CatalogView: View {
 
             Text("No results found")
                 .font(.system(size: 17, weight: .semibold))
+                .accessibilityIdentifier("emptyCatalogLabel")
 
             Text("Try a different search or category")
                 .font(.system(size: 14))
