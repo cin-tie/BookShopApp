@@ -14,8 +14,8 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             CatalogView(cartViewModel: cartViewModel)
-                .tabItem { Label("Shop", systemImage: "books.vertical.fill") }
                 .accessibilityIdentifier("shopTab")
+                .tabItem { Label("Shop", systemImage: "books.vertical.fill") }
 
             CartView(viewModel: cartViewModel)
                 .tabItem { Label("Cart", systemImage: "cart.fill") }
