@@ -621,10 +621,10 @@ Main screens:
 
 | Team Member | Role | Responsibilities |
 |---|---|---|
-| Your Name | Project Manager / Team Lead | Project management, requirements, CI/CD, architecture |
-| Team Member 2 | iOS Developer | SwiftUI implementation, business logic |
-| Team Member 3 | UI/UX Designer | Figma mockups, interface design |
-| Team Member 4 | Tester | Unit tests, UI tests, test plans |
+| Neyfeld Kirill | Project Manager / Team Lead | Project management, requirements, CI/CD, architecture |
+| Shulga Maria | iOS Developer | SwiftUI implementation, business logic |
+| Kazlou Maksim | UI/UX Designer | Figma mockups, interface design |
+| Drozd Yahor | Tester | Unit tests, UI tests, test plans |
 
 ---
 
