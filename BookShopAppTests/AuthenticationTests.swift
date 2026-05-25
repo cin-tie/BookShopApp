@@ -1,303 +1,183 @@
 // AuthenticationTests.swift
-// BookShopApp – Unit Tests
-// Covers: login validation, empty fields, password validation, logout, session restore
+// BookShopAppTests — Unit Tests
 
 import XCTest
 @testable import BookShopApp
 
-// MARK: - AuthenticationTests
+// MARK: - AuthValidator
 
-final class AuthenticationTests: XCTestCase {
+final class AuthValidatorTests: XCTestCase {
 
-    var authViewModel: AuthViewModel!
-    var mockUserService: MockUserService!
+    func testValidEmailPassesValidation() {
+        XCTAssertNoThrow(try AuthValidator.validateEmail("user@example.com"))
+    }
 
-    // MARK: Setup / Teardown
+    func testEmptyEmailThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validateEmail("")) { error in
+            XCTAssertEqual(error.localizedDescription, "Email cannot be empty")
+        }
+    }
+
+    func testWhitespaceEmailThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validateEmail("   "))
+    }
+
+    func testInvalidEmailThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validateEmail("notanemail")) { error in
+            XCTAssertEqual(error.localizedDescription, "Enter a valid email address")
+        }
+    }
+
+    func testEmailWithoutDomainThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validateEmail("user@"))
+    }
+
+    func testValidPasswordPassesValidation() {
+        XCTAssertNoThrow(try AuthValidator.validatePassword("strongpass"))
+    }
+
+    func testEmptyPasswordThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validatePassword("")) { error in
+            XCTAssertEqual(error.localizedDescription, "Password cannot be empty")
+        }
+    }
+
+    func testShortPasswordThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validatePassword("1234567")) { error in
+            XCTAssertEqual(error.localizedDescription, "Password must be at least 8 characters")
+        }
+    }
+
+    func testPasswordExactly8CharsPassesValidation() {
+        XCTAssertNoThrow(try AuthValidator.validatePassword("12345678"))
+    }
+
+    func testMatchingPasswordsPassValidation() {
+        XCTAssertNoThrow(try AuthValidator.validatePasswordMatch("password", "password"))
+    }
+
+    func testMismatchedPasswordsThrowError() {
+        XCTAssertThrowsError(try AuthValidator.validatePasswordMatch("password", "different")) { error in
+            XCTAssertEqual(error.localizedDescription, "Passwords do not match")
+        }
+    }
+
+    func testValidNamePassesValidation() {
+        XCTAssertNoThrow(try AuthValidator.validateName("Maria"))
+    }
+
+    func testEmptyNameThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validateName("")) { error in
+            XCTAssertEqual(error.localizedDescription, "Name cannot be empty")
+        }
+    }
+
+    func testWhitespaceNameThrowsError() {
+        XCTAssertThrowsError(try AuthValidator.validateName("   "))
+    }
+}
+
+// MARK: - SessionService
+
+final class SessionServiceTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockUserService = MockUserService()
-        authViewModel = AuthViewModel(userService: mockUserService)
+        SessionService.shared.logout()
+        UserDefaults.standard.removeObject(forKey: "all_users")
+        UserDefaults.standard.removeObject(forKey: "session_user")
     }
 
     override func tearDown() {
-        authViewModel = nil
-        mockUserService = nil
+        SessionService.shared.logout()
+        UserDefaults.standard.removeObject(forKey: "all_users")
+        UserDefaults.standard.removeObject(forKey: "session_user")
         super.tearDown()
     }
 
-    // MARK: - Login Validation
-
-    func testLoginWithValidCredentialsSucceeds() {
-        // Given
-        mockUserService.stubbedLoginResult = .success(User.stub())
-        authViewModel.email = "user@example.com"
-        authViewModel.password = "ValidPass1!"
-
-        // When
-        authViewModel.login()
-
-        // Then
-        XCTAssertTrue(authViewModel.isLoggedIn)
-        XCTAssertNil(authViewModel.errorMessage)
+    func testRegisterWithValidDataSucceeds() {
+        let error = SessionService.shared.register(
+            name: "Test User", email: uniqueEmail(),
+            password: "password123", confirm: "password123"
+        )
+        XCTAssertNil(error)
+        XCTAssertNotNil(SessionService.shared.currentUser)
     }
 
-    func testLoginWithInvalidCredentialsFails() {
-        // Given
-        mockUserService.stubbedLoginResult = .failure(AuthError.invalidCredentials)
-        authViewModel.email = "user@example.com"
-        authViewModel.password = "WrongPass"
-
-        // When
-        authViewModel.login()
-
-        // Then
-        XCTAssertFalse(authViewModel.isLoggedIn)
-        XCTAssertNotNil(authViewModel.errorMessage)
+    func testRegisterSetsCurrentUser() {
+        let email = uniqueEmail()
+        _ = SessionService.shared.register(name: "Test", email: email, password: "pass1234", confirm: "pass1234")
+        XCTAssertEqual(SessionService.shared.currentUser?.email, email)
     }
 
-    func testLoginWithMalformedEmailFails() {
-        authViewModel.email = "notAnEmail"
-        authViewModel.password = "ValidPass1!"
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
-        XCTAssertEqual(authViewModel.errorMessage, AuthError.invalidEmail.localizedDescription)
+    func testRegisterWithEmptyNameReturnsError() {
+        let error = SessionService.shared.register(name: "", email: uniqueEmail(), password: "pass1234", confirm: "pass1234")
+        XCTAssertNotNil(error)
     }
 
-    // MARK: - Empty Fields
-
-    func testLoginWithEmptyEmailShowsError() {
-        authViewModel.email = ""
-        authViewModel.password = "ValidPass1!"
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
-        XCTAssertEqual(authViewModel.errorMessage, AuthError.emptyEmail.localizedDescription)
+    func testRegisterWithInvalidEmailReturnsError() {
+        let error = SessionService.shared.register(name: "User", email: "bad-email", password: "pass1234", confirm: "pass1234")
+        XCTAssertNotNil(error)
     }
 
-    func testLoginWithEmptyPasswordShowsError() {
-        authViewModel.email = "user@example.com"
-        authViewModel.password = ""
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
-        XCTAssertEqual(authViewModel.errorMessage, AuthError.emptyPassword.localizedDescription)
+    func testRegisterWithShortPasswordReturnsError() {
+        let error = SessionService.shared.register(name: "User", email: uniqueEmail(), password: "123", confirm: "123")
+        XCTAssertNotNil(error)
     }
 
-    func testLoginWithBothFieldsEmptyShowsError() {
-        authViewModel.email = ""
-        authViewModel.password = ""
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
-        XCTAssertNotNil(authViewModel.errorMessage)
+    func testRegisterWithMismatchedPasswordsReturnsError() {
+        let error = SessionService.shared.register(name: "User", email: uniqueEmail(), password: "pass1234", confirm: "different")
+        XCTAssertNotNil(error)
     }
 
-    func testLoginWithWhitespaceOnlyEmailFails() {
-        authViewModel.email = "   "
-        authViewModel.password = "ValidPass1!"
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
+    func testRegisterDuplicateEmailReturnsError() {
+        let email = uniqueEmail()
+        _ = SessionService.shared.register(name: "User1", email: email, password: "pass1234", confirm: "pass1234")
+        SessionService.shared.logout()
+        let error = SessionService.shared.register(name: "User2", email: email, password: "pass1234", confirm: "pass1234")
+        XCTAssertNotNil(error)
+        XCTAssertTrue(error?.contains("already exists") == true)
     }
 
-    // MARK: - Password Validation
-
-    func testPasswordTooShortFails() {
-        // Minimum 8 characters
-        authViewModel.email = "user@example.com"
-        authViewModel.password = "Ab1!"
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
-        XCTAssertEqual(authViewModel.errorMessage, AuthError.passwordTooShort.localizedDescription)
+    func testLoginWithRegisteredEmailSucceeds() {
+        let email = uniqueEmail()
+        _ = SessionService.shared.register(name: "User", email: email, password: "pass1234", confirm: "pass1234")
+        SessionService.shared.logout()
+        let error = SessionService.shared.login(email: email, password: "pass1234")
+        XCTAssertNil(error)
+        XCTAssertNotNil(SessionService.shared.currentUser)
     }
 
-    func testPasswordWithoutUppercaseFails() {
-        authViewModel.email = "user@example.com"
-        authViewModel.password = "validpass1!"
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
+    func testLoginWithUnknownEmailReturnsError() {
+        let error = SessionService.shared.login(email: "nobody@nowhere.com", password: "pass1234")
+        XCTAssertNotNil(error)
+        XCTAssertNil(SessionService.shared.currentUser)
     }
 
-    func testPasswordWithoutDigitFails() {
-        authViewModel.email = "user@example.com"
-        authViewModel.password = "ValidPass!"
-        authViewModel.login()
-        XCTAssertFalse(authViewModel.isLoggedIn)
+    func testLoginWithEmptyEmailReturnsError() {
+        let error = SessionService.shared.login(email: "", password: "pass1234")
+        XCTAssertNotNil(error)
     }
 
-    func testPasswordValidatorAcceptsStrongPassword() {
-        let validator = PasswordValidator()
-        XCTAssertTrue(validator.isValid("StrongPass1!"))
+    func testLoginWithEmptyPasswordReturnsError() {
+        let error = SessionService.shared.login(email: uniqueEmail(), password: "")
+        XCTAssertNotNil(error)
     }
 
-    func testPasswordValidatorRejectsWeakPassword() {
-        let validator = PasswordValidator()
-        XCTAssertFalse(validator.isValid("weak"))
+    func testLogoutClearsCurrentUser() {
+        _ = SessionService.shared.register(name: "User", email: uniqueEmail(), password: "pass1234", confirm: "pass1234")
+        XCTAssertNotNil(SessionService.shared.currentUser)
+        SessionService.shared.logout()
+        XCTAssertNil(SessionService.shared.currentUser)
     }
 
-    // MARK: - Logout
-
-    func testLogoutClearsSession() {
-        // Given – user is logged in
-        mockUserService.stubbedLoginResult = .success(User.stub())
-        authViewModel.email = "user@example.com"
-        authViewModel.password = "ValidPass1!"
-        authViewModel.login()
-        XCTAssertTrue(authViewModel.isLoggedIn)
-
-        // When
-        authViewModel.logout()
-
-        // Then
-        XCTAssertFalse(authViewModel.isLoggedIn)
-        XCTAssertNil(authViewModel.currentUser)
+    func testLogoutRemovesSessionFromUserDefaults() {
+        _ = SessionService.shared.register(name: "User", email: uniqueEmail(), password: "pass1234", confirm: "pass1234")
+        SessionService.shared.logout()
+        XCTAssertNil(UserDefaults.standard.data(forKey: "session_user"))
     }
 
-    func testLogoutRemovesTokenFromStorage() {
-        mockUserService.stubbedLoginResult = .success(User.stub())
-        authViewModel.email = "user@example.com"
-        authViewModel.password = "ValidPass1!"
-        authViewModel.login()
-        authViewModel.logout()
-        XCTAssertFalse(mockUserService.sessionTokenExists())
-    }
-
-    // MARK: - Session Restore
-
-    func testSessionRestoresOnAppLaunchWhenTokenExists() {
-        // Given – simulate a previously saved token
-        mockUserService.stubbedSessionUser = User.stub()
-
-        // When – new viewModel tries to restore
-        let newViewModel = AuthViewModel(userService: mockUserService)
-        newViewModel.restoreSession()
-
-        // Then
-        XCTAssertTrue(newViewModel.isLoggedIn)
-        XCTAssertNotNil(newViewModel.currentUser)
-    }
-
-    func testSessionNotRestoredWhenNoTokenExists() {
-        mockUserService.stubbedSessionUser = nil
-        let newViewModel = AuthViewModel(userService: mockUserService)
-        newViewModel.restoreSession()
-        XCTAssertFalse(newViewModel.isLoggedIn)
-    }
-}
-
-// MARK: - Supporting Mocks & Stubs
-
-/// Represents a minimal User model for test stubs.
-struct User {
-    let id: String
-    let email: String
-    let name: String
-
-    static func stub(
-        id: String = "user-1",
-        email: String = "user@example.com",
-        name: String = "Test User"
-    ) -> User {
-        User(id: id, email: email, name: name)
-    }
-}
-
-enum AuthError: Error, LocalizedError {
-    case invalidCredentials
-    case invalidEmail
-    case emptyEmail
-    case emptyPassword
-    case passwordTooShort
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidCredentials: return "Invalid email or password."
-        case .invalidEmail:       return "Please enter a valid email address."
-        case .emptyEmail:         return "Email cannot be empty."
-        case .emptyPassword:      return "Password cannot be empty."
-        case .passwordTooShort:   return "Password must be at least 8 characters."
-        }
-    }
-}
-
-protocol UserServiceProtocol {
-    func login(email: String, password: String) -> Result<User, Error>
-    func logout()
-    func sessionTokenExists() -> Bool
-    func currentSessionUser() -> User?
-}
-
-class MockUserService: UserServiceProtocol {
-    var stubbedLoginResult: Result<User, Error> = .failure(AuthError.invalidCredentials)
-    var stubbedSessionUser: User?
-
-    func login(email: String, password: String) -> Result<User, Error> { stubbedLoginResult }
-    func logout() { stubbedSessionUser = nil }
-    func sessionTokenExists() -> Bool { stubbedSessionUser != nil }
-    func currentSessionUser() -> User? { stubbedSessionUser }
-}
-
-struct PasswordValidator {
-    /// At least 8 chars, one uppercase letter, one digit.
-    func isValid(_ password: String) -> Bool {
-        guard password.count >= 8 else { return false }
-        let hasUpper = password.contains(where: \.isUppercase)
-        let hasDigit = password.contains(where: \.isNumber)
-        return hasUpper && hasDigit
-    }
-}
-
-/// Minimal stand-in ViewModel; replace with your real AuthViewModel.
-class AuthViewModel: ObservableObject {
-    @Published var email: String = ""
-    @Published var password: String = ""
-    @Published var isLoggedIn: Bool = false
-    @Published var errorMessage: String?
-    @Published var currentUser: User?
-
-    private let userService: UserServiceProtocol
-    private let passwordValidator = PasswordValidator()
-
-    init(userService: UserServiceProtocol) {
-        self.userService = userService
-    }
-
-    func login() {
-        let trimmedEmail = email.trimmingCharacters(in: .whitespaces)
-        let trimmedPassword = password.trimmingCharacters(in: .whitespaces)
-
-        guard !trimmedEmail.isEmpty else {
-            errorMessage = AuthError.emptyEmail.localizedDescription; return
-        }
-        guard !trimmedPassword.isEmpty else {
-            errorMessage = AuthError.emptyPassword.localizedDescription; return
-        }
-        guard trimmedEmail.contains("@") && trimmedEmail.contains(".") else {
-            errorMessage = AuthError.invalidEmail.localizedDescription; return
-        }
-        guard passwordValidator.isValid(trimmedPassword) else {
-            errorMessage = AuthError.passwordTooShort.localizedDescription; return
-        }
-
-        switch userService.login(email: trimmedEmail, password: trimmedPassword) {
-        case .success(let user):
-            currentUser = user
-            isLoggedIn = true
-            errorMessage = nil
-        case .failure(let error):
-            isLoggedIn = false
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    func logout() {
-        userService.logout()
-        isLoggedIn = false
-        currentUser = nil
-        errorMessage = nil
-    }
-
-    func restoreSession() {
-        if let user = userService.currentSessionUser() {
-            currentUser = user
-            isLoggedIn = true
-        }
+    private func uniqueEmail() -> String {
+        "test_\(UUID().uuidString.prefix(8))@test.com"
     }
 }
