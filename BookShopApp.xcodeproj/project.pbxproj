@@ -62,6 +62,7 @@
 		636EB5BA2FC3E53100304344 /* CartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5B92FC3E53100304344 /* CartTests.swift */; };
 		636EB5BC2FC3E7C700304344 /* CoverageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5BB2FC3E7C700304344 /* CoverageTests.swift */; };
 		636EB5BE2FC3E84300304344 /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5BD2FC3E84300304344 /* AuthenticationTests.swift */; };
+		636EB5C22FC3EE2500304344 /* ExtendedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5C12FC3EE2500304344 /* ExtendedUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -139,6 +140,7 @@
 		636EB5B92FC3E53100304344 /* CartTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CartTests.swift; path = "../../../../Downloads/files(3) 2/CartTests.swift"; sourceTree = "<group>"; };
 		636EB5BB2FC3E7C700304344 /* CoverageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoverageTests.swift; sourceTree = "<group>"; };
 		636EB5BD2FC3E84300304344 /* AuthenticationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
+		636EB5C12FC3EE2500304344 /* ExtendedUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtendedUITests.swift; sourceTree = "<group>"; };
 		A860D4E22FBDBD51006E79B3 /* BookShopApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookShopApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -325,6 +327,7 @@
 		636EB57D2FC35EDE00304344 /* BookShopAppUITests */ = {
 			isa = PBXGroup;
 			children = (
+				636EB5C12FC3EE2500304344 /* ExtendedUITests.swift */,
 				636EB5872FC35EF900304344 /* AuthenticationUITests.swift */,
 				636EB5B72FC3CD7300304344 /* CartUITests.swift */,
 			);
@@ -495,6 +498,7 @@
 			files = (
 				636EB5882FC35EF900304344 /* AuthenticationUITests.swift in Sources */,
 				636EB5B82FC3CD7300304344 /* CartUITests.swift in Sources */,
+				636EB5C22FC3EE2500304344 /* ExtendedUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
