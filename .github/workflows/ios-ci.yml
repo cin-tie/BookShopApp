@@ -37,14 +37,20 @@ jobs:
           -resolvePackageDependencies \
           -project BookShopApp.xcodeproj
 
+      - name: Clean Build Folder
+        run: |
+          xcodebuild clean \
+          -project BookShopApp.xcodeproj \
+          -scheme BookShopApp
+      
       - name: Build Application
         run: |
-          xcodebuild clean build \
+          xcodebuild build \
           -project BookShopApp.xcodeproj \
           -scheme BookShopApp \
           -destination "${{ matrix.destination }}" \
           CODE_SIGNING_ALLOWED=NO
-
+        
       - name: Run Unit Tests
         run: |
           xcodebuild test \
