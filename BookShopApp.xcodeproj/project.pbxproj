@@ -58,9 +58,9 @@
 		636EB5672FC357C600304344 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5342FC357C500304344 /* ContentView.swift */; };
 		636EB5682FC357C600304344 /* Property List.plist in Resources */ = {isa = PBXBuildFile; fileRef = 636EB5352FC357C500304344 /* Property List.plist */; };
 		636EB5772FC35EA600304344 /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5762FC35EA600304344 /* AuthenticationTests.swift */; };
-		636EB57F2FC35EDE00304344 /* BookShopAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB57E2FC35EDE00304344 /* BookShopAppUITests.swift */; };
-		636EB5812FC35EDE00304344 /* BookShopAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5802FC35EDE00304344 /* BookShopAppUITestsLaunchTests.swift */; };
 		636EB5882FC35EF900304344 /* AuthenticationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5872FC35EF900304344 /* AuthenticationUITests.swift */; };
+		636EB5B82FC3CD7300304344 /* CartUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5B72FC3CD7300304344 /* CartUITests.swift */; };
+		636EB5BA2FC3E53100304344 /* CartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636EB5B92FC3E53100304344 /* CartTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,9 +134,9 @@
 		636EB56D2FC35E4600304344 /* BookShopAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookShopAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		636EB5762FC35EA600304344 /* AuthenticationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
 		636EB57C2FC35EDE00304344 /* BookShopAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookShopAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		636EB57E2FC35EDE00304344 /* BookShopAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookShopAppUITests.swift; sourceTree = "<group>"; };
-		636EB5802FC35EDE00304344 /* BookShopAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookShopAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		636EB5872FC35EF900304344 /* AuthenticationUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationUITests.swift; sourceTree = "<group>"; };
+		636EB5B72FC3CD7300304344 /* CartUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartUITests.swift; sourceTree = "<group>"; };
+		636EB5B92FC3E53100304344 /* CartTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CartTests.swift; path = "../../../../Downloads/files(3) 2/CartTests.swift"; sourceTree = "<group>"; };
 		A860D4E22FBDBD51006E79B3 /* BookShopApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookShopApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -313,6 +313,7 @@
 		636EB56E2FC35E4600304344 /* BookShopAppTests */ = {
 			isa = PBXGroup;
 			children = (
+				636EB5B92FC3E53100304344 /* CartTests.swift */,
 				636EB5762FC35EA600304344 /* AuthenticationTests.swift */,
 			);
 			path = BookShopAppTests;
@@ -322,8 +323,7 @@
 			isa = PBXGroup;
 			children = (
 				636EB5872FC35EF900304344 /* AuthenticationUITests.swift */,
-				636EB57E2FC35EDE00304344 /* BookShopAppUITests.swift */,
-				636EB5802FC35EDE00304344 /* BookShopAppUITestsLaunchTests.swift */,
+				636EB5B72FC3CD7300304344 /* CartUITests.swift */,
 			);
 			path = BookShopAppUITests;
 			sourceTree = "<group>";
@@ -481,6 +481,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				636EB5772FC35EA600304344 /* AuthenticationTests.swift in Sources */,
+				636EB5BA2FC3E53100304344 /* CartTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -488,9 +489,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				636EB57F2FC35EDE00304344 /* BookShopAppUITests.swift in Sources */,
 				636EB5882FC35EF900304344 /* AuthenticationUITests.swift in Sources */,
-				636EB5812FC35EDE00304344 /* BookShopAppUITestsLaunchTests.swift in Sources */,
+				636EB5B82FC3CD7300304344 /* CartUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

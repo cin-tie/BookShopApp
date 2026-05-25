@@ -12,8 +12,6 @@ final class AuthenticationUITests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments = ["UI_TESTING", "RESET_SESSION"]
         app.launch()
-        
-        print(app.debugDescription)
     }
 
     override func tearDown() {
@@ -32,11 +30,15 @@ final class AuthenticationUITests: XCTestCase {
         XCTAssertTrue(passwordField.waitForExistence(timeout: 5))
         XCTAssertTrue(loginButton.waitForExistence(timeout: 5))
 
-        emailField.tap()
-        emailField.typeText(email)
+        if !email.isEmpty {
+            emailField.tap()
+            emailField.typeText(email)
+        }
 
-        passwordField.tap()
-        passwordField.typeText(password)
+        if !password.isEmpty {
+            passwordField.tap()
+            passwordField.typeText(password)
+        }
 
         loginButton.tap()
     }

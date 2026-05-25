@@ -67,8 +67,9 @@ struct ProductCard: View {
                             .background(product.isAvailable ? Color.accent : Color(.systemGray4))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(.plain)     
-                    .accessibilityIdentifier("addToCartButton\(product.id)")
+                    .buttonStyle(.plain)    
+                    .accessibilityElement()
+                    .accessibilityIdentifier("addToCartButton")
                     .disabled(!product.isAvailable)
                 }
             }

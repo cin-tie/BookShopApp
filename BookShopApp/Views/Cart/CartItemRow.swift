@@ -52,6 +52,7 @@ struct CartItemRow: View {
                         .foregroundStyle(.red.opacity(0.7))
                 }
                 .buttonStyle(.plain)          // ← ключевой фикс
+                .accessibilityIdentifier("removeButton")
 
                 HStack(spacing: 0) {
                     Button(action: onDecrement) {
@@ -59,11 +60,14 @@ struct CartItemRow: View {
                             .font(.system(size: 11, weight: .bold))
                             .frame(width: 28, height: 28)
                     }
-                    .buttonStyle(.plain)      // ← ключевой фикс
+                    .buttonStyle(.plain)      // ← ключевой фикс]
+                    .accessibilityIdentifier("decrementButton")
 
                     Text("\(item.quantity)")
                         .font(.system(size: 14, weight: .semibold))
                         .frame(width: 28)
+                        .accessibilityElement()
+                        .accessibilityIdentifier("quantityLabel")
 
                     Button(action: onIncrement) {
                         Image(systemName: "plus")
@@ -71,6 +75,7 @@ struct CartItemRow: View {
                             .frame(width: 28, height: 28)
                     }
                     .buttonStyle(.plain)      // ← ключевой фикс
+                    .accessibilityIdentifier("incrementButton")
                 }
                 .background(Color(.systemGray6))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -79,5 +84,8 @@ struct CartItemRow: View {
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())            // ← делаем явную hit-область
+        .accessibilityElement(children: .contain)
+        .accessibilityElement()
+        .accessibilityIdentifier("cartItemRow")
     }
 }
