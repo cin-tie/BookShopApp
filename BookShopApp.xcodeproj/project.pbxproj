@@ -137,7 +137,7 @@
 		636EB57C2FC35EDE00304344 /* BookShopAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookShopAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		636EB5872FC35EF900304344 /* AuthenticationUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationUITests.swift; sourceTree = "<group>"; };
 		636EB5B72FC3CD7300304344 /* CartUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartUITests.swift; sourceTree = "<group>"; };
-		636EB5B92FC3E53100304344 /* CartTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CartTests.swift; path = "../../../../Downloads/files(3) 2/CartTests.swift"; sourceTree = "<group>"; };
+		636EB5B92FC3E53100304344 /* CartTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CartTests.swift; path = "CartTests.swift"; sourceTree = "<group>"; };
 		636EB5BB2FC3E7C700304344 /* CoverageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoverageTests.swift; sourceTree = "<group>"; };
 		636EB5BD2FC3E84300304344 /* AuthenticationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
 		636EB5C12FC3EE2500304344 /* ExtendedUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtendedUITests.swift; sourceTree = "<group>"; };
