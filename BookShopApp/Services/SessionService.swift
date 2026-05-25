@@ -20,7 +20,23 @@ final class SessionService: ObservableObject {
     }
 
     // MARK: - Session
+        
+    #if DEBUG
+    func loginForUITests() {
+        let user = User(
+            id: UUID(),
+            name: "Test User",
+            email: "test@test.com"
+        )
 
+        currentUser = user
+
+        if let data = try? JSONEncoder().encode(user) {
+            UserDefaults.standard.set(data, forKey: userKey)
+        }
+    }
+    #endif
+    
     private func restoreSession() {
         guard let data = UserDefaults.standard.data(forKey: userKey),
               let user = try? JSONDecoder().decode(User.self, from: data)
